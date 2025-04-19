@@ -4,11 +4,13 @@ import { Advertisement } from "../../../types/types";
 import AdCard from "../../AdCard";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../../ui/carousel";
 import Loader from "../../Loader";
+import { useAuth } from "../../../context/AuthContext";
 
 
 const AdList = ({userType}:{userType:string}) => {
   const [ads, setAds] = useState<Advertisement[]>([]);
   const [loading,setLoading] = useState<boolean>(false)
+  const {token} = useAuth()
   const fetchAds = async () => {
     try {
       setLoading(true)
@@ -18,8 +20,8 @@ const AdList = ({userType}:{userType:string}) => {
         {
           headers:{
             Accept:'application/json',
-            Authorization:`Bearer ${localStorage.getItem('token')}`
-          },
+            Authorization:`Bearer ${token}`
+          }
         }
       );
       setAds(data);

@@ -3,15 +3,18 @@ import { Advertisement } from '../types/types'
 import { Button } from './ui/button'
 import { adminApi } from '../api/axios';
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const AdCard = ({ad,userType,onDeleteSuccess}:{ad:Advertisement,userType:string,onDeleteSuccess?:()=>void}) => {
     const navigate = useNavigate()
     const [loading,setIsLoading] = useState<boolean>(false)
+    const {token} = useAuth()
     const handleDelete = async (id: number) => {
         setIsLoading(true)
         const res = await adminApi.delete(`delete_advertisement?id=${id}`,{
             headers:{
-                Accept:'application/json'
+                Accept:'application/json',
+                Authorization:`Bearer ${token}`
             }
         })
         navigate('/admin/dashboard')
@@ -21,7 +24,7 @@ const AdCard = ({ad,userType,onDeleteSuccess}:{ad:Advertisement,userType:string,
     };
     return (
         
-        <div key={ad.id} className="border w-full m-2 md:w-[500px] h-[400px] p-4 rounded shadow">
+        <div key={ad.id} className="border w-[90%] m-2 md:w-[500px] h-[400px] p-4 rounded shadow">
             <Link to={ userType === 'admin' ? `/admin/dashboard/view_ad/${ad.id}`:''}>
                 <img src={ad.image} alt={ad.title} className="w-full h-[300px] object-cover" />
                 <h3 className="text-lg font-semibold mt-2">{ad.title}</h3>

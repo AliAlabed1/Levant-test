@@ -8,11 +8,12 @@ import { Button } from "../../ui/button";
 import { adminApi } from "../../../api/axios";
 import { Advertisement } from "../../../types/types";
 import Loader from "../../Loader";
+import { useAuth } from "../../../context/AuthContext";
 
 const AdvertisementForm = ({ mode }: { mode: "add" | "edit" }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const {token} = useAuth()
   const [form, setForm] = useState<Advertisement>({
     id: 0,
     title: "",
@@ -32,7 +33,12 @@ const AdvertisementForm = ({ mode }: { mode: "add" | "edit" }) => {
       const fetchAd = async () => {
         setLoading(true);
         try {
-          const response = await adminApi.get(`/show_advertisement?id=${id}`);
+          const response = await adminApi.get(`/show_advertisement?id=${id}`,{
+            headers:{
+              Accept:'application/json',
+              Authorization:`Bearer ${token}`
+            }
+          });
           const data = response.data.data;
           setForm({
             ...data,
@@ -71,7 +77,10 @@ const AdvertisementForm = ({ mode }: { mode: "add" | "edit" }) => {
           : "/add_advertisement";
 
       const response = await adminApi.post(url, fd, {
-        headers: { Accept: "application/json" },
+        headers:{
+          Accept:'application/json',
+          Authorization:`Bearer ${token}`
+        },
       });
 
       toast.success(

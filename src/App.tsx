@@ -1,8 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {  Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Admin/Login";
 import AdList from "./components/Admin/Ads/AdList";
 import PrivateRoute from "./routes/PrivateRoute";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Toaster } from "sonner";
 import Header from "./components/Header";
 import Home from "./components/Home";
@@ -10,19 +10,34 @@ import AddToggeler from "./components/Admin/AddToggeler";
 import AdForm from "./components/Admin/Ads/AdForm";
 import ViewAd from "./components/ViewAd";
 import Items from "./components/Items";
+import { useEffect, useState } from "react";
 
 const App = () => {
+  const{login}= useAuth();
+  const [token,setToken] = useState<string>()
+  const  getCredintials = async()=>{
+    const token  = await localStorage.getItem('token')
+    const name = await localStorage.getItem('name')
+    if(token && name){
+      login(token,name)
+      setToken(token)
+    }
+      
+  }
+  useEffect(()=>{
+    getCredintials()
+  },[])
   return (
     <div className="min-w-full">
       <Toaster />
       
       <AuthProvider>
-      <BrowserRouter>
+      
         <Header />
         <Routes>
           <Route path = '/' element={
               <PrivateRoute>
-                <></>
+                <Navigate to='/admin/dashboard'/>
               </PrivateRoute>
             }
           />
@@ -66,8 +81,7 @@ const App = () => {
           <Route path='/guest/view_ad/:id' element={<ViewAd userType="guest" />}/>
           <Route path='/guest/cat_item/:id' element={<Items/>}/>
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
     </div>
   );
 };
