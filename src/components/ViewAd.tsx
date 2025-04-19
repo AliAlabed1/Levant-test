@@ -3,17 +3,24 @@ import { useNavigate, useParams } from "react-router-dom";
 import { adminApi,userApi } from "../api/axios";
 import { Advertisement } from "../types/types";
 import { Button } from "./ui/button";
+import { useAuth } from "../context/AuthContext";
+import Loader from "./Loader";
 
 const ViewAd = ({userType}:{userType:string}) => {
   const { id } = useParams();
   const [ad, setAd] = useState<Advertisement | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const {token} = useAuth()
   useEffect(() => {
     const fetchAd = async () => {
       try {
         const api = userType ==='admin'? adminApi : userApi
-        const res = await api.get(`/show_advertisement?id=${id}`);
+        const res = await api.get(`/show_advertisement?id=${id}`,{
+          headers:{
+            Accept:'application/json',
+            Authorization:`Bearer ${token}`
+          }
+        });
         setAd(res.data.data);
       } catch (err) {
         console.error("Failed to fetch advertisement", err);
@@ -25,7 +32,7 @@ const ViewAd = ({userType}:{userType:string}) => {
     if (id) fetchAd();
   }, [id]);
   const navigate = useNavigate()
-  if (loading) return <div className="p-6">Loading...</div>;
+  if (loading) return <Loader/>
   if (!ad) return <div className="p-6 text-red-500">Advertisement not found.</div>;
 
   return (
